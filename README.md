@@ -1,3 +1,4 @@
+Esse programa é uma modificação de um programa já existente, foi acresentado o calculo de expressões matemáticas
 #AST visualizer
 
 The script `astvisualizer.py` contained in this repository visualizes a Python AST trees.
