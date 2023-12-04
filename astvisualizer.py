@@ -8,7 +8,7 @@ from uuid import uuid4 as uuid
 import optparse
 import sys
 
-def main(args):
+def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as analises, programa principal
     parser = optparse.OptionParser(usage="astvisualizer.py [options] [string]")
     parser.add_option("-f", "--file", action="store",
                       help="Read a code snippet from the specified file")
@@ -30,14 +30,28 @@ def main(args):
     if options.label:
         label = options.label
 
-    code_ast = ast.parse(code)
+    code_ast = ast.parse(code) #analisa com o pacote ast
     transformed_ast = transform_ast(code_ast)
-
-    renderer = GraphRenderer()
+    math_expressions = extract_math_expressions(code) #ACRESCENTADO
+    results = {}
+    for expr in math_expressions:
+        result = eval(expr)
+        results[expr] = result
+    
+    transformed_ast['Math_Expressions'] = results #ACRESCENTADO
+    renderer = GraphRenderer() #desenha o grafico de ast com o pacote graphviz
     renderer.render(transformed_ast, label=label)
+    #ACRESCENTADO
+def extract_math_expressions(code):
+    math_expressions = re.split(r';\s*', code)
+    valid_expressions = []
+    for expr in math_expressions:
+        # Verifica se a expressão é uma expressão matemática válida
+        if re.match(r'\b\d+\s*[\+\-\*\/]\s*\d+\b', expr):
+            valid_expressions.append(expr)
+    return valid_expressions
 
-
-def transform_ast(code_ast):
+def transform_ast(code_ast):#transforma recursivamente o codigo ast
     if isinstance(code_ast, ast.AST):
         node = {to_camelcase(k): transform_ast(getattr(code_ast, k)) for k in code_ast._fields}
         node['node_type'] = to_camelcase(code_ast.__class__.__name__)
@@ -56,7 +70,9 @@ class GraphRenderer:
     """
     this class is capable of rendering data structures consisting of
     dicts and lists as a graph using graphviz
+    
     """
+    #clase que desenha a analise de ast, configuração de cores
 
     graphattrs = {
         'labelloc': 't',
@@ -135,10 +151,10 @@ class GraphRenderer:
         self._graph = None
         self._rendered_nodes = None
 
-        # display the graph
+        # mostra o grapho, abre o pdf automaticamente
         graph.format = "pdf"
         graph.view()
         subprocess.Popen(['xdg-open', "test.pdf"])
-
+    
 if __name__ == '__main__':
     main(sys.argv)
