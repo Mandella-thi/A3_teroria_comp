@@ -1,5 +1,9 @@
 Esse programa é uma modificação de um programa já existente, foi acresentado o calculo de expressões matemáticas
 #AST visualizer
+Lucas Aoki Ra: 821239078,
+Iago Guimarães de Oliveira Ra: 8222244160, 
+Angelica Bicego Ferreira Ra:321220089,  
+Thiago Garcia dos Santos Ra: 821215213
 
 The script `astvisualizer.py` contained in this repository visualizes a Python AST trees.
 
