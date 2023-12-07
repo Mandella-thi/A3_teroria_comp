@@ -34,12 +34,18 @@ def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as 
     ast_transformado = transformar_ast(ast_codigo)
     expressoes_matematicas = extrair_expressoes_matematicas(code) #ACRESCENTADO
     results = {}
-    for expr in expressoes_matematicas:
-        result = eval(expr)
-        print(expr)#janela de teste1
-        results[expr] = result
-        #print(result)#janela de teste2
-    
+    try:
+        for expr in expressoes_matematicas:
+            result = eval(expr)
+            print(expr)#janela de teste1
+            results[expr] = result
+            #print(result)#janela de teste2
+    except SyntaxError:
+        print("erro de sintaxe na expressão:", expr)
+    except Exception as e:
+        print("Erro semântico na expressão:", expr)
+        print("Detalhes: ", str(e))
+
     ast_transformado['Expressoes_Matematicas'] = results #ACRESCENTADO
     renderer = GraphRenderer() #desenha o grafico de ast com o pacote graphviz
     renderer.render(ast_transformado, label=label)
@@ -141,7 +147,7 @@ class GraphRenderer:
             child_node_id = self._render_node(value)
             self._graph.edge(node_id, child_node_id, label=self._escape_dot_label(str(idx)))
 
-
+    
     def render(self, data, *, label=None):
         # cria o grafo
         graphattrs = self.attrsgrafos.copy()
@@ -155,11 +161,14 @@ class GraphRenderer:
         self._render_node(data)
         self._graph = None
         self._rendered_nodes = None
-
-        # mostra o grafo, abre o pdf automaticamente
-        graph.format = "pdf"
-        graph.view()
-        subprocess.Popen(['xdg-open', "test.pdf"])
+        try:
+            # mostra o grafo, abre o pdf automaticamente
+            graph.format = "pdf"
+            graph.view()
+            subprocess.Popen(['xdg-open', "test.pdf"])
+        except Exception as e:
+                        e
+    
     
 if __name__ == '__main__':
     main(sys.argv)
