@@ -10,26 +10,13 @@ import sys
 
 def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as analises, programa principal
     parser = optparse.OptionParser(usage="astvisualizer.py [options] [string]")
-    parser.add_option("-f", "--file", action="store",
-                      help="Read a code snippet from the specified file")
-    parser.add_option("-l", "--label", action="store",
-                      help="The label for the visualization")
-
+    parser.add_option("-f", "--file")
     options, args = parser.parse_args(args)
     if options.file:
         with open(options.file) as instream:
             code = instream.read()
         label = options.file
-    elif len(args) == 2:
-        code = args[1]
-        label = "<code read from command line parameter>"
-    else:
-        print("Expecting Python code on stdin...")
-        code = sys.stdin.read()
-        label = "<code read from stdin>"
-    if options.label:
-        label = options.label
-
+  
     ast_codigo = ast.parse(code) #analisa com o pacote ast
     ast_transformado = transformar_ast(ast_codigo)
     expressoes_matematicas = extrair_expressoes_matematicas(code) #ACRESCENTADO
