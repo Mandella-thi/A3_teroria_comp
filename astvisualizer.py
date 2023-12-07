@@ -30,65 +30,60 @@ def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as 
     if options.label:
         label = options.label
 
-    code_ast = ast.parse(code) #analisa com o pacote ast
-    transformed_ast = transform_ast(code_ast)
-    math_expressions = extract_math_expressions(code) #ACRESCENTADO
+    ast_codigo = ast.parse(code) #analisa com o pacote ast
+    ast_transformado = transformar_ast(ast_codigo)
+    expressoes_matematicas = extrair_expressoes_matematicas(code) #ACRESCENTADO
     results = {}
-    for expr in math_expressions:
+    for expr in expressoes_matematicas:
         result = eval(expr)
         results[expr] = result
     
-    transformed_ast['Math_Expressions'] = results #ACRESCENTADO
+    ast_transformado['Expressoes_Matematicas'] = results #ACRESCENTADO
     renderer = GraphRenderer() #desenha o grafico de ast com o pacote graphviz
-    renderer.render(transformed_ast, label=label)
+    renderer.render(ast_transformado, label=label)
     #ACRESCENTADO
-def extract_math_expressions(code):
-    math_expressions = re.split(r';\s*', code)
-    valid_expressions = []
-    for expr in math_expressions:
+def extrair_expressoes_matematicas(code):
+    expr_matematicas = re.split(r';\s*', code)
+    expressoes_validas = []
+    for expr in expr_matematicas:
         # Verifica se a expressão é uma expressão matemática válida
         if re.match(r'\b\d+\s*[\+\-\*\/]\s*\d+\b', expr):
-            valid_expressions.append(expr)
-    return valid_expressions
+            expressoes_validas.append(expr)
+    return expressoes_validas
 
-def transform_ast(code_ast):#transforma recursivamente o codigo ast
-    if isinstance(code_ast, ast.AST):
-        node = {to_camelcase(k): transform_ast(getattr(code_ast, k)) for k in code_ast._fields}
-        node['node_type'] = to_camelcase(code_ast.__class__.__name__)
+def transformar_ast(codigo_ast):#transforma recursivamente o codigo ast
+    if isinstance(codigo_ast, ast.AST):
+        node = {para_camelcase(k): transformar_ast(getattr(codigo_ast, k)) for k in codigo_ast._fields}
+        node['tipo_node'] = para_camelcase(codigo_ast.__class__.__name__)
         return node
-    elif isinstance(code_ast, list):
-        return [transform_ast(el) for el in code_ast]
+    elif isinstance(codigo_ast, list):
+        return [transformar_ast(el) for el in codigo_ast]
     else:
-        return code_ast
+        return codigo_ast
 
 
-def to_camelcase(string):
+def para_camelcase(string):
     return re.sub('([a-z0-9])([A-Z])', r'\1_\2', string).lower()
 
 
 class GraphRenderer:
-    """
-    this class is capable of rendering data structures consisting of
-    dicts and lists as a graph using graphviz
-    
-    """
     #clase que desenha a analise de ast, configuração de cores
 
-    graphattrs = {
+    attrsgrafos = {
         'labelloc': 't',
         'fontcolor': 'white',
         'bgcolor': '#333333',
         'margin': '0',
     }
 
-    nodeattrs = {
+    attrsnos = {
         'color': 'white',
         'fontcolor': 'white',
         'style': 'filled',
         'fillcolor': '#006699',
     }
 
-    edgeattrs = {
+    attrbordas = {
         'color': 'white',
         'fontcolor': 'white',
     }
@@ -122,9 +117,9 @@ class GraphRenderer:
 
 
     def _render_dict(self, node, node_id):
-        self._graph.node(node_id, label=node.get("node_type", "[dict]"))
+        self._graph.node(node_id, label=node.get("tipo_node", "[dict]"))
         for key, value in node.items():
-            if key == "node_type":
+            if key == "tipo_node":
                 continue
             child_node_id = self._render_node(value)
             self._graph.edge(node_id, child_node_id, label=self._escape_dot_label(key))
@@ -138,20 +133,20 @@ class GraphRenderer:
 
 
     def render(self, data, *, label=None):
-        # create the graph
-        graphattrs = self.graphattrs.copy()
+        # cria o grafo
+        graphattrs = self.attrsgrafos.copy()
         if label is not None:
             graphattrs['label'] = self._escape_dot_label(label)
-        graph = gv.Digraph(graph_attr = graphattrs, node_attr = self.nodeattrs, edge_attr = self.edgeattrs)
+        graph = gv.Digraph(graph_attr = graphattrs, node_attr = self.attrsnos, edge_attr = self.attrbordas)
 
-        # recursively draw all the nodes and edges
+        # desenha todos os nós e bordas recursivamente
         self._graph = graph
         self._rendered_nodes = set()
         self._render_node(data)
         self._graph = None
         self._rendered_nodes = None
 
-        # mostra o grapho, abre o pdf automaticamente
+        # mostra o grafo, abre o pdf automaticamente
         graph.format = "pdf"
         graph.view()
         subprocess.Popen(['xdg-open', "test.pdf"])
