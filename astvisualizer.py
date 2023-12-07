@@ -36,7 +36,9 @@ def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as 
     results = {}
     for expr in expressoes_matematicas:
         result = eval(expr)
+        print(expr)#janela de teste1
         results[expr] = result
+        #print(result)#janela de teste2
     
     ast_transformado['Expressoes_Matematicas'] = results #ACRESCENTADO
     renderer = GraphRenderer() #desenha o grafico de ast com o pacote graphviz
@@ -47,8 +49,16 @@ def extrair_expressoes_matematicas(code):
     expressoes_validas = []
     for expr in expr_matematicas:
         # Verifica se a expressão é uma expressão matemática válida
-        if re.match(r'\b\d+\s*[\+\-\*\/]\s*\d+\b', expr):
-            expressoes_validas.append(expr)
+        if re.match(r'\b\d+(\s*[\+\-\*\/]\s*\d+|\s*\(\s*\d+\s*[\+\-\*\/]\s*\d+\s*\))+\b', expr):
+                try:
+                    ast.parse(expr)
+                    expressoes_validas.append(expr)
+                except SyntaxError:
+                    print("erro de sintaxe na expressão:", expr)
+                except Exception as e:
+                    print("Erro semântico na expressão:", expr)
+                    print("Detalhes: ", str(e))
+        
     return expressoes_validas
 
 def transformar_ast(codigo_ast):#transforma recursivamente o codigo ast
