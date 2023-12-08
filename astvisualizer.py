@@ -24,9 +24,9 @@ def main(args):#escolhe qual o tipo de entrada que o programa vai usar e usa as 
     try:
         for expr in expressoes_matematicas:
             result = eval(expr)
-            print(expr)#janela de teste1
+            
             results[expr] = result
-            #print(result)#janela de teste2
+            
     except SyntaxError:
         print("erro de sintaxe na expressão:", expr)
     except Exception as e:
