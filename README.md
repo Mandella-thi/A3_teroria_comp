@@ -5,6 +5,7 @@ Lucas Aoki Ra: 821239078,
 Iago Guimarães de Oliveira Ra: 8222244160, 
 Angelica Bicego Ferreira Ra:321220089,  
 Thiago Garcia dos Santos Ra: 821215213
+é dificil instalar a biblioteca graphviz no windows, para isso é mais fácil instalar com o chocolatey.
 
 The script `astvisualizer.py` contained in this repository visualizes a Python AST trees.
 
